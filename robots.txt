@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://brunapassara.com.br/sitemap.xml
