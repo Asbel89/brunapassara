@@ -1,43 +1,58 @@
-const form = document.getElementById('lead-form');
-const nomeEl = document.getElementById('f-nome');
-const inglesEl = document.getElementById('f-ingles');
-const quandoEl = document.getElementById('f-quando');
-const moneyEl = document.getElementById('f-money');
-const btnSubmit = document.getElementById('btn-submit');
-const formOk = document.getElementById('form-ok');
-const WA = 'https://wa.me/message/JQ7TFFYIMI4OJ1';
+(() => {
+  const form = document.getElementById('lead-form');
+  if (!form) return;
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+  const nome = document.getElementById('f-nome');
+  const ingles = document.getElementById('f-ingles');
+  const quando = document.getElementById('f-quando');
+  const money = document.getElementById('f-money');
+  const duvida = document.getElementById('f-duvida');
+  const success = document.getElementById('form-success');
+  const fallback = document.getElementById('wa-fallback');
+  const button = document.getElementById('btn-submit');
 
-  const nome = nomeEl.value.trim();
-  if (!nome) {
-    nomeEl.focus();
-    nomeEl.style.borderColor = '#e11d48';
-    return;
-  }
-  nomeEl.style.borderColor = '';
+  const WHATSAPP = 'https://wa.me/353833722711';
 
-  const ingles = inglesEl.value;
-  const quando = quandoEl.value
-    ? new Date(quandoEl.value + '-02').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-    : 'nos próximos meses';
-  const money = moneyEl.value;
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-  const texto = `Olá Bruna! Sou ${nome} 🇧🇷\nVi que você trabalha em escola em Dublin e quero informação REAL 🏫🇮🇪\n\n• Inglês: ${ingles}\n• Quero ir: ${quando}\n• Investimento: ${money}\n\nPode me passar valores, turmas e meu diagnóstico gratuito? 💚`;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
 
-  try {
-    await navigator.clipboard.writeText(texto);
-  } catch {}
+    const linhas = [
+      'Olá, Bruna! Vim pelo seu site. ☘️',
+      '',
+      `Meu nome é ${nome.value.trim()}.`,
+      `Nível de inglês: ${ingles.value}.`,
+      `Quando quero ir: ${quando.value.trim() || 'ainda não defini'}.`,
+      `Investimento previsto: ${money.value}.`
+    ];
 
-  btnSubmit.disabled = true;
-  btnSubmit.textContent = 'ABRINDO WHATSAPP…';
-  formOk.hidden = false;
+    if (duvida.value.trim()) {
+      linhas.push(`O que quero saber: ${duvida.value.trim()}`);
+    }
 
-  window.open(WA, '_blank', 'noopener');
+    linhas.push(
+      '',
+      'Pode me passar mais informações sobre o intercâmbio na Irlanda?'
+    );
 
-  setTimeout(() => {
-    btnSubmit.disabled = false;
-    btnSubmit.textContent = 'ENVIAR FORMULÁRIO →';
-  }, 3000);
-});
+    const url = `${WHATSAPP}?text=${encodeURIComponent(linhas.join('\n'))}`;
+
+    fallback.href = url;
+    success.hidden = false;
+
+    window.open(url, '_blank', 'noopener');
+
+    const textoOriginal = button.innerHTML;
+    button.textContent = 'Abrindo o WhatsApp…';
+    button.disabled = true;
+
+    window.setTimeout(() => {
+      button.innerHTML = textoOriginal;
+      button.disabled = false;
+    }, 2500);
+  });
+})();
